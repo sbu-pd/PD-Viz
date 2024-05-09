@@ -1,14 +1,28 @@
-from flask import Flask, jsonify, request, render_template
-import firebase_admin
-from firebase_admin import credentials, db
-
+import os
 import json
+import firebase_admin
+from dotenv import load_dotenv
+from firebase_admin import credentials, db
+from flask import Flask, jsonify, request, render_template
 
 from data_wrangler import process_data
+load_dotenv()
 
 app = Flask(__name__)
 
-cred = credentials.Certificate('./pd-app.json')
+firebase_credentials = {
+    "type": os.getenv("FIREBASE_TYPE"),
+    "project_id": os.getenv("FIREBASE_PROJECT_ID"),
+    "private_key_id": os.getenv("FIREBASE_PRIVATE_KEY_ID"),
+    "private_key": os.getenv("FIREBASE_PRIVATE_KEY").replace('\\n', '\n'),
+    "client_email": os.getenv("FIREBASE_CLIENT_EMAIL"),
+    "client_id": os.getenv("FIREBASE_CLIENT_ID"),
+    "auth_uri": os.getenv("FIREBASE_AUTH_URI"),
+    "token_uri": os.getenv("FIREBASE_TOKEN_URI"),
+    "auth_provider_x509_cert_url": os.getenv("FIREBASE_AUTH_PROVIDER_CERT_URL"),
+    "client_x509_cert_url": os.getenv("FIREBASE_CLIENT_CERT_URL")
+}
+cred = credentials.Certificate(firebase_credentials)
 firebase_admin.initialize_app(cred, {
     'databaseURL': 'https://pd-app-8c25c-default-rtdb.firebaseio.com/'
 })
