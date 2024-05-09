@@ -1,0 +1,256 @@
+:root {
+  --dashboard-header-height: 20%; /* Configurable height for header */
+    --bg-color: #010D17; /* Dark background */
+    --card-color: #1B253E; /* Darker shade for cards */
+    --alt-card-color: #212C48;
+    --text-color: #FFFFFF; /* White text for better contrast */
+    --highlight-color: #62C462; /* Green color for highlights */
+    --border-radius: 8px; /* Border radius for cards */
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden; /* Prevent scrolling on the entire page */
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--bg-color);
+  overflow: hidden; /* Prevent scrollbars */
+}
+
+.label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tooltip {	
+  position: absolute;			
+  text-align: center;			
+  width: auto;					
+  height: auto;					
+  padding: 2px;				
+  font: 1.5rem sans-serif;		
+  background: lightsteelblue;	
+  border: 0px;		
+  border-radius: 8px;			
+  pointer-events: none;			
+  opacity: 0;
+  z-index: 1000;
+}
+
+.abril {
+  font-family: "Abril Fatface", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+nav {
+  padding: 10px 20px;
+  background: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar-title {
+  background-color: #303655;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  outline: none;
+  font-size: 1.2rem;
+}
+
+#refresh-button {
+  background-color: #303655;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+  outline: none;
+  font-size: 1.2rem;
+  float: right;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 20px;
+  gap: 10px; /* Spacing between filters and Tests card */
+  height: var(--dashboard-header-height);
+}
+
+.filters {
+  background: var(--card-color);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  box-sizing: border-box;
+  gap: 10px;
+  padding: 20px;
+  width: 30%;
+  align-items: flex-start;
+  min-width: 250px; /* Minimum width for responsiveness */
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  height: fit-content; /* Adjust height based on content */
+}
+
+.filters select {
+  width: 100%;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  font-size: 1rem;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-color: #212C48;
+  color: #fff;
+  cursor: pointer;
+}
+
+.card {
+  width: 70%; /* Tests card occupies the rest of the width */
+  background-color: var(--card-color);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: left;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.test-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.total-users-count {
+  background-color: #303655;
+  color: white;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-size: 1.2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.dashboard-main {
+  flex-grow: 1;
+  padding: 10px;
+  display: flex;
+  height: 75%; /* Takes up the rest of the page's height after header */
+  overflow: hidden; /* This will hide any overflow */
+}
+
+#graph-area, #graph-area * {
+  box-sizing: border-box; /* Includes padding and border in the element's total dimension */
+}
+
+.graph-area, .data-table {
+  background-color: var(--card-color);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: auto;
+}
+
+.graph-area {
+  width: 65%;
+  margin-right: 10px;
+}
+
+.data-table {
+  color: #FFFFFF;
+  width: 35%;
+  flex: 1; /* Allow the data table to grow but not beyond the container's height */
+  overflow: auto; /* Make the data-table itself scrollable */
+}
+
+
+#data-table pre {
+  margin: 0;
+  overflow-x: auto; /* Ensure horizontal scrolling within pre tag if needed */
+
+}
+
+.raw-data-heading {
+  background-color: #303655;
+  color: white;
+  padding: 10px;
+  margin-top: 0;
+  text-align: center; /* Center the text */
+  border-radius: 10px;
+}
+
+/* For webkit browsers like Chrome and Safari */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1); /* Light scrollbar track */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888; /* Darker scrollbar handle */
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555; /* Slightly darker scrollbar handle on hover */
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #888 rgba(255, 255, 255, 0.1); /* thumb and track color */
+}
+
+.graph-placeholder {
+  color: rgba(255, 255, 255, 0.5); /* Faded white text */
+  text-align: center; /* Center the text */
+  margin-top: 50%; /* Center vertically */
+  transform: translateY(-50%); /* Ensure it's centered on the exact vertical middle */
+  font-style: italic; /* Optional: style as italic */
+}
+
+
+@media (max-width: 768px) {
+  .dashboard-header {
+      flex-direction: column;
+      height: auto;
+  }
+
+  .filters, .card {
+      width: 100%;
+      margin-right: 0;
+      margin-bottom: 10px; /* Adds space below the filters */
+  }
+
+  .dashboard-main {
+      flex-direction: column;
+      height: auto;
+  }
+
+  .graph-area, .data-table {
+      width: 100%;
+      margin-bottom: 10px;
+  }
+}

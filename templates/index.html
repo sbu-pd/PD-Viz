@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PD App</title>
+    <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav>
+        <button class="navbar-title abril">Parkinson's Disease Monitoring App</button>
+        <button id="refresh-button" onclick="loadUsersAndTests()">⟳</button>
+    </nav>
+    <section class="dashboard-header">
+        <div id="filters" class="filters" style="height: 182px;">
+            <select id="user-filter" onchange="loadUsersAndTests()">
+                <option value="" disabled selected>Filter by User</option>
+                <!-- User options will be dynamically loaded -->
+            </select>
+            <select id="test-filter" onchange="loadUsersAndTests()">
+                <option value="" disabled selected>Filter by Test Name</option>
+                <!-- Test name options will be dynamically loaded -->
+            </select>
+        </div>
+        <div class="card" id="tests-card">
+            <!-- <h2>Tests</h2> -->
+            <svg id="tests-chart"></svg>
+            <div class="test-info">
+                <div class="total-users-count" id="total-users">
+                    <span class="">0 Users</span>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div class="dashboard-main">
+        <div class="graph-area" id="graph-area">
+            <div class="graph-placeholder" id="graph-placeholder">
+                Select filters to visualize data
+            </div>  
+            <!-- D3.js graph will be injected here -->
+        </div>
+        <div id="data-table" class="data-table">
+            <!-- The Raw Data heading and content will be dynamically inserted here -->
+          </div>          
+    
+          <script src="{{ url_for('static', filename='js/plotFunctions.js') }}" type="module"></script>
+    <script src="{{ url_for('static', filename='js/index.js') }}" type="module"></script>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+</body>
+</html>
