@@ -99,5 +99,5 @@ def get_users_tests():
         print("Stored plot data in json")
     return jsonify(response_data)
 
-if __name__ == '__main__':
-    app.run(debug=True)
+# if __name__ == '__main__':
+#     app.run(debug=True)
