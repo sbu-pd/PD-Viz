@@ -79,32 +79,34 @@ def finger_tapping(data):
             res[user] = finger_tapping(user_data)
         return res
 
-    res = {}
-    for data_chunk in data:
-        for session_date, data_pts in data_chunk.items():
-            if session_date not in res:
-                res[session_date] = {}
-            for hand, hand_values in data_pts.items():
-                if hand not in res[session_date]:
-                    res[session_date][hand] = {}
-                for prop, prop_values in hand_values.items():
-                    if prop not in res[session_date][hand]:
-                        res[session_date][hand][prop] = []
-                    if prop in {"LeftButton", "RightButton"}:
-                        pressed, released = [], []
-                        for i in prop_values.values():
-                            if "Pressed" in i:
-                                pressed.append(i["Pressed"])
-                            elif "Released" in i:
-                                released.append(i["Released"])
-                        for i in range(len(released)):
-                            res[session_date][hand][prop].append(released[i] - pressed[i])
-                    if prop == "TapAcceleration":
-                        res[session_date][hand][prop] = handle_raw_acceleration_data(prop_values)
-                    if prop == "TapCount":
-                        print(prop_values[list(prop_values.keys())[-1]])
-                        res[session_date][hand][prop] = prop_values[list(prop_values.keys())[-1]]
+    try:
+        for data_chunk in data:
+            for session_date, data_pts in data_chunk.items():
+                if session_date not in res:
+                    res[session_date] = {}
+                for hand, hand_values in data_pts.items():
+                    if hand not in res[session_date]:
+                        res[session_date][hand] = {}
+                    for prop, prop_values in hand_values.items():
+                        if prop not in res[session_date][hand]:
+                            res[session_date][hand][prop] = []
+                        if prop in {"LeftButton", "RightButton"}:
+                            pressed, released = [], []
+                            for i in prop_values.values():
+                                if "Pressed" in i:
+                                    pressed.append(i["Pressed"])
+                                elif "Released" in i:
+                                    released.append(i["Released"])
+                            for i in range(len(released)):
+                                res[session_date][hand][prop].append(released[i] - pressed[i])
+                        if prop == "TapAcceleration":
+                            res[session_date][hand][prop] = handle_raw_acceleration_data(prop_values)
+                        if prop == "TapCount":
+                            print(prop_values[list(prop_values.keys())[-1]])
+                            res[session_date][hand][prop] = prop_values[list(prop_values.keys())[-1]]
 
+    except Exception as e:
+        print(e)
     return res
 
 def anti_tapping(data):
@@ -146,21 +148,272 @@ def anti_tapping(data):
 
     return dict(res)
 
+def dot_counting(data):
+    res = {}
+    if not data:
+        return res
+
+    if type(data) == dict:
+        for user, user_data in data.items():
+            res[user] = dot_counting(user_data)
+        return res
+
+    try:
+        res = defaultdict(list)
+
+        for trial_data in data:
+            for session_date, d in trial_data.items():
+                current_session_list = []
+                total_trial_count = len(d) - 1
+                total_correct = 0
+                for data_pt_ in d[1:]:
+                    for _, data_pt in data_pt_.items():
+                        button_displayed = data_pt["button_displayed"]
+                        button_pressed_sequence = ''.join(data_pt["button_pressed"])
+                        trial_number = data_pt["trial"]
+
+                        # Determine accuracy
+                        is_correct = button_displayed == button_pressed_sequence
+                        if is_correct:
+                            total_correct += 1
+                        current_session_list.append({
+                            "trial": trial_number,
+                            "button_displayed": button_displayed,
+                            "button_pressed_sequence": button_pressed_sequence,
+                            "is_correct": is_correct
+                        })
+                res[session_date].append({
+                    'total_trials' : total_trial_count,
+                    'total_correct' : total_correct,
+                    'all_trials' : current_session_list
+                })
+
+        return dict(res)
+    except Exception as e:
+        print(e)
+        return res
+
+def face_name_recognition(data):
+    res = {}
+    if not data:
+        return res
+
+    if type(data) == dict:
+        for user, user_data in data.items():
+            res[user] = face_name_recognition(user_data)
+        return res
+
+    try:
+        res = defaultdict(list)
+        for trial_data in data:
+            for session_date, session_data in trial_data.items():
+                current_session_data = []
+                total_trial_count = len(session_data)
+                total_correct = 0
+                for instance_data in session_data:
+                    for _, d in instance_data.items():
+                        is_correct = d.get('name_displayed') == d.get('name_pressed')
+                        if is_correct:
+                            total_correct += 1
+                        current_session_data.append({
+                            'name_displayed' : d.get('name_displayed'),
+                            'name_pressed' : d.get('name_pressed'),
+                            'is_correct' : is_correct
+                        })
+                res[session_date].append({
+                    'total_trials' : total_trial_count,
+                    'total_correct' : total_correct,
+                    'all_trials' : current_session_data
+                })
+        
+        return dict(res)
+    except Exception as e:
+        print(e)
+        return res
+
+def flanker_test(data):
+    res = {}
+    if not data:
+        return res
+
+    if type(data) == dict:
+        for user, user_data in data.items():
+            res[user] = flanker_test(user_data)
+        return res
+
+    try:
+        res = defaultdict(list)
+        for trial_data in data:
+            for session_date, session_data in trial_data.items():
+                current_session_data = []
+                total_trial_count = len(session_data) - 1
+                total_correct = 0
+                for instance_data in session_data[1:]:
+                    for _, d in instance_data.items():
+                        print(d)
+                        is_correct = False
+                        if d.get('feedback') == "Correct":
+                            total_correct += 1
+                            is_correct = True
+                        reaction_time = 0
+                        if d.get("button_pressed") and d.get("button_displayed"):
+                            reaction_time = int(d.get("button_pressed")) - d.get("button_displayed")
+                        current_session_data.append({
+                            'reaction_time' : reaction_time,
+                            'is_correct' : is_correct,
+                            'trial': d.get('trial')
+                        })
+
+                res[session_date].append({
+                    'total_trials': total_trial_count,
+                    'total_correct' : total_correct -1,
+                    'all_trials' : current_session_data
+                })
+
+        return dict(res)
+    except Exception as e:
+        print(e)
+        return None
+
+def running_dots_test(data):
+    res = {}
+    if not data:
+        return res
+
+    if type(data) == dict:
+        for user, user_data in data.items():
+            res[user] = running_dots_test(user_data)
+        return res
+    try:
+        res = defaultdict(list)
+        for trial_data in data:
+            for session_date, session_data in trial_data.items():
+                current_session_data = []
+                total_correct = 0
+                total_trial_count = len(session_data) - 1
+                for instance_data in session_data[1:]:
+                    for _, d in instance_data.items():
+                        is_correct = True if d.get('is_correct') == 1 else False
+                        if is_correct:
+                            total_correct += 1
+                        current_session_data.append({
+                            'dot_count' : d.get('dot_count'),
+                            'is_correct' : is_correct
+                        })
+
+                res[session_date].append({
+                    'total_trials' : total_trial_count,
+                    'total_correct' : total_correct,
+                    'all_trials': current_session_data
+                })
+
+        return dict(res)
+    except Exception as e:
+        print(e)
+        return None    
+
+
+def acceleration_angvelocity_processor(data):
+    if not data:
+        return None
+    session_data = defaultdict(lambda: {
+        "Acceleration": defaultdict(dict),
+        "AngularVelocity": defaultdict(dict)
+    })
+
+    for data_chunk in data:
+        for session_date, acc_data in data_chunk.items():
+            for acc, data_pt in acc_data.items():
+                time_series_data = {"x":[], "y": [], "z": []}
+                for k, v in data_pt.items():
+                    time_series_data["x"].append(v.get("x", 0))
+                    time_series_data["y"].append(v.get("y", 0))
+                    time_series_data["z"].append(v.get("z", 0))
+                session_data[session_date][acc] = time_series_data
+
+    session_data = {date: {acc_type: dict(acc_data) for acc_type, acc_data in sessions.items()} for date, sessions in session_data.items()}
+    return session_data
+
+def balance_test(data):
+    res = {}
+
+    if not data:
+        return None
+
+    if type(data) == dict:
+        for user, user_data in data.items():
+            res[user] = balance_test(user_data)
+        return res
+    
+    try:
+        return acceleration_angvelocity_processor(data)
+    except Exception as e:
+        print(e)
+        return None
+
+def tremors_test(data):
+    res = {}
+    if not data:
+        return None
+
+    if type(data) == dict:
+        for user, user_data in data.items():
+            res[user] = tremors_test(user_data)
+        return res
+    
+    try:
+        res = defaultdict(lambda: {
+            "Left": {
+                "Acceleration": defaultdict(dict),
+                "AngularVelocity": defaultdict(dict),
+            },
+            "Right": {
+                "Acceleration": defaultdict(dict),
+                "AngularVelocity": defaultdict(dict),
+            }
+        })
+
+        for data_chunk in data:
+            for session_date, hands_data in data_chunk.items():
+                for hand, acc_data in hands_data.items():
+                    for acc_type, data_pt in acc_data.items():
+                        time_series_data = {"x":[], "y": [], "z": []}
+                        for k, v in data_pt.items():
+                            time_series_data["x"].append(v.get("x", 0))
+                            time_series_data["y"].append(v.get("y", 0))
+                            time_series_data["z"].append(v.get("z", 0))
+                        res[session_date][hand][acc_type] = time_series_data
+
+        # Convert defaultdicts to regular dicts
+        res = {
+            date: {
+                hand: {
+                    acc_type: dict(acc_data) for acc_type, acc_data in hands.items()
+                } for hand, hands in sessions.items()
+            } for date, sessions in res.items()
+        }
+
+        return res
+    except Exception as e:
+        print(e)
+        return None
+
+
 def dummy_func(data):
     return {}
 
 
 func_mapper = {
     "AntiTapping": anti_tapping,
-    "BalanceTest": dummy_func,
-    "DotCounting": dummy_func,
-    "FaceNameRecognition": dummy_func,
+    "BalanceTest": balance_test,
+    "DotCounting": dot_counting,
+    "FaceNameRecognition": face_name_recognition,
     "FingerTapping": finger_tapping,
-    "FlankerTest": dummy_func,
+    "FlankerTest": flanker_test,
     "ReactionTime": reaction_time,
-    "RunningDotTest": dummy_func,
-    "TremorsTest": dummy_func,
-    "WalkTest": dummy_func
+    "RunningDotTest": running_dots_test,
+    "TremorsTest": tremors_test,
+    "WalkTest": balance_test
 }
 
 def process_data(data, user_filter, test_filter):

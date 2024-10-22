@@ -230,11 +230,32 @@ function renderChart(data, userFilter, testFilter) {
       .style("pointer-events", "none"); // Tooltip should not interfere with mouse events
 }
 
+async function loadDropdownKeys() {
+    try {
+        const response = await fetch('/get-all-collections');
+        const keys = await response.json();
+        const dropdown = document.getElementById('key-dropdown');
+        dropdown.innerHTML = '<option value="" disabled selected>Select Collection</option>';
+
+        keys.forEach(key => {
+            const option = document.createElement('option');
+            option.value = key;
+            option.text = key;
+            dropdown.appendChild(option);
+        });
+
+        dropdown.value = 'PROD_PDAPP';
+    } catch (error) {
+        console.error('Error loading dropdown keys:', error);
+    }
+}
+
 function loadUsersAndTests() {
+    const collectionKeyValue = document.getElementById('key-dropdown').value || "PROD_PDAPP";
   const userFilterValue = document.getElementById('user-filter').value || "";
   const testFilterValue = document.getElementById('test-filter').value || "";
 
-  fetch(`/get-users-tests?user=${userFilterValue}&test=${testFilterValue}`)
+  fetch(`/get-users-tests?user=${userFilterValue}&test=${testFilterValue}&collection-key=${collectionKeyValue}`)
       .then(response => response.json())
       .then(response_data => {
           const plotData = response_data['plot_data'];
@@ -253,9 +274,11 @@ function loadUsersAndTests() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  loadUsersAndTests();
+    loadDropdownKeys();
+    loadUsersAndTests();
 
-  // Add event listeners to dropdowns for filter change
-  document.getElementById('user-filter').addEventListener('change', loadUsersAndTests);
-  document.getElementById('test-filter').addEventListener('change', loadUsersAndTests);
+    // Add event listeners to dropdowns for filter change
+    document.getElementById('key-dropdown').addEventListener('change', loadUsersAndTests);
+    document.getElementById('user-filter').addEventListener('change', loadUsersAndTests);
+    document.getElementById('test-filter').addEventListener('change', loadUsersAndTests);
 });

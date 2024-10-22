@@ -69,6 +69,7 @@ nav {
   cursor: pointer;
   outline: none;
   font-size: 1.2rem;
+  margin-right: auto;
 }
 
 #refresh-button {
@@ -81,6 +82,19 @@ nav {
   outline: none;
   font-size: 1.2rem;
   float: right;
+  margin-left: 10px;
+}
+
+#key-dropdown {
+  margin-left: 10px;
+  padding: 5px;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  outline: none;
+  background-color: #303655;
+  color: white;
 }
 
 .dashboard-header {

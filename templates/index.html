@@ -12,6 +12,9 @@
 <body>
     <nav>
         <button class="navbar-title abril">Parkinson's Disease Monitoring App</button>
+        <select id="key-dropdown" onchange="loadUsersAndTests()"></select>
+            <!-- Options will be dynamically loaded -->
+        </select>
         <button id="refresh-button" onclick="loadUsersAndTests()">⟳</button>
     </nav>
     <section class="dashboard-header">

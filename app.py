@@ -31,12 +31,19 @@ firebase_admin.initialize_app(cred, {
 def index():
     return render_template('index.html')
 
+
+@app.route('/get-all-collections', methods=['GET'])
+def get_all_collections():
+    key_list = ['PDAPP', 'PROD_PDAPP', 'TEST_PDAPP']
+    return jsonify(key_list)
+
 @app.route('/get-users-tests', methods=['GET'])
 def get_users_tests():
+    collection_key = request.args.get('collection-key', 'PROD_PDAPP')
     user_filter = request.args.get('user', None)
     test_filter = request.args.get('test', None)
 
-    query_ref = db.reference('PDAPP')
+    query_ref = db.reference(collection_key)
     raw_data, plot_data = {}, {}
     response_data = {}
 
@@ -99,5 +106,5 @@ def get_users_tests():
         print("Stored plot data in json")
     return jsonify(response_data)
 
-# if __name__ == '__main__':
-#     app.run(debug=True)
+if __name__ == '__main__':
+    app.run(debug=True)

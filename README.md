@@ -16,7 +16,7 @@ $ sudo apt-get install git
 Clone the repository into a new directory:
 
 ```
-$ git clone https://github.com/jannelson36/Data-Vibe.git
+$ git clone git@github.com:sbu-pd/PD-Viz.git
 ```
 Begin by creating a virtual Python environment:
 
