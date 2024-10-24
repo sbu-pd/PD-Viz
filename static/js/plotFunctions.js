@@ -984,7 +984,14 @@ function plotFingerTapping(data, userFilterValue) {
                 let rightTimes = session.RightHand?.RightButton || [];
                 let allTimes = leftTimes.concat(rightTimes);
 
-                const avgTime = d3.median(allTimes);
+                // Calculate inter-tap intervals
+                let interTapIntervals = [];
+                for (let i = 0; i < allTimes.length - 1; i++) {
+                    interTapIntervals.push(allTimes[i + 1] - allTimes[i]);
+                }
+
+                // Compute median of the inter-tap intervals
+                const avgTime = d3.median(interTapIntervals);
                 avgReactionTimes.push({ session: sessionLabel, avgTime: avgTime });
             });
 
@@ -1076,6 +1083,145 @@ function plotFingerTapping(data, userFilterValue) {
     }
 }
 
+// function plotFingerTappingSessionDetails(data, userFilterValue, sessionLabel) {
+//     console.log("Plotting session details for:", sessionLabel);
+
+//     const graphArea = document.getElementById('graph-area');
+//     const graphWidth = graphArea.clientWidth;
+//     const graphHeight = graphArea.clientHeight;
+
+//     const margin = { top: 50, right: 100, bottom: 100, left: 100 };
+//     const width = graphWidth - margin.left - margin.right;
+//     const height = graphHeight - margin.top - margin.bottom;
+
+//     d3.select("#graph-area").selectAll("svg").remove();
+
+//     const svg = d3.select('#graph-area').append('svg')
+//         .attr('width', '100%')
+//         .attr('height', '100%')
+//         .attr('viewBox', `0 0 ${graphWidth} ${graphHeight}`)
+//         .append('g')
+//         .attr('transform', `translate(${margin.left},${margin.top})`);
+
+//     const session = data[userFilterValue].FingerTapping[sessionLabel];
+
+//     const leftData = session.LeftHand && session.LeftHand.LeftButton !== undefined ? session.LeftHand.LeftButton.map((time, i) => ({ index: i, time })) : [];
+//     // console.log("left", leftData);
+//     const rightData = session.RightHand && session.RightHand.RightButton !== undefined ? session.RightHand.RightButton.map((time, i) => ({ index: i, time })) : [];
+//     // console.log("right", rightData);
+    
+//     const xScale = d3.scaleLinear()
+//         .domain([0, Math.max(leftData.length, rightData.length)])
+//         .range([0, width]);
+
+//     const yScale = d3.scaleLinear()
+//         .domain([0, d3.max([...leftData.map(d => d.time), ...rightData.map(d => d.time)])])
+//         .range([height, 0])
+//         .nice();
+
+//     // Add X and Y axis
+//     svg.append("g")
+//         .attr("transform", `translate(0,${height})`)
+//         .call(d3.axisBottom(xScale))
+//         .selectAll("text")
+//         .style("fill", "white");
+
+//     svg.select(".domain").attr("stroke", "white");  // Make X-axis line white
+//     svg.selectAll(".tick line").attr("stroke", "white");  // Make X-axis tick marks white
+    
+//     svg.append("g")
+//         .call(d3.axisLeft(yScale))
+//         .selectAll("text")
+//         .style("fill", "white");
+
+//     svg.selectAll(".domain").attr("stroke", "white");  // Make Y-axis line white
+//     svg.selectAll(".tick line").attr("stroke", "white");  // Make Y-axis tick marks white        
+
+//     // Add X-axis label
+//     svg.append("text")
+//         .attr("text-anchor", "middle")
+//         .attr("x", width / 2)
+//         .attr("y", height + margin.bottom - 20)  // Position below the axis
+//         .style("fill", "white")
+//         .text("Tap Count");
+
+//     // Add Y-axis label
+//     svg.append("text")
+//         .attr("text-anchor", "middle")
+//         .attr("transform", "rotate(-90)")  // Rotate to align with Y-axis
+//         .attr("x", -height / 2)  // Center along Y-axis
+//         .attr("y", -margin.left + 20)  // Position to the left of the Y-axis
+//         .style("fill", "white")
+//         .text("Time (milliseconds)");
+
+//     // Line generator
+//     const lineGenerator = d3.line()
+//         .x(d => xScale(d.index))
+//         .y(d => yScale(d.time));
+
+//     // Draw the line for left hand
+//     if (leftData.length > 0) {
+//         svg.append("path")
+//             .datum(leftData)
+//             .attr("fill", "none")
+//             .attr("stroke", "green")
+//             .attr("stroke-width", 2)
+//             .attr("d", lineGenerator);
+//     }
+
+//     // Draw the line for right hand
+//     if (rightData.length > 0) {
+//         svg.append("path")
+//             .datum(rightData)
+//             .attr("fill", "none")
+//             .attr("stroke", "blue")
+//             .attr("stroke-width", 2)
+//             .attr("d", lineGenerator);
+//     }
+
+//     // Add title for the session detail plot
+//     svg.append("text")
+//         .attr("x", width / 2)
+//         .attr("y", -10)
+//         .attr("text-anchor", "middle")
+//         .style("font-size", "20px")
+//         .text(`Session ${sessionLabel} - Left vs Right Hand Reaction Time`)
+//         .style("fill", "white");
+
+//     // Add a legend
+//     const legend = svg.append("g")
+//         .attr("transform", `translate(${width - 100}, 30)`);
+
+//     // Legend for the left hand (green)
+//     legend.append("rect")
+//         .attr("x", 0)
+//         .attr("y", 0)
+//         .attr("width", 10)
+//         .attr("height", 10)
+//         .attr("fill", "green");
+
+//     legend.append("text")
+//         .attr("x", 20)
+//         .attr("y", 10)
+//         .style("fill", "white")
+//         .text("Left Hand");
+
+//     // Legend for the right hand (blue)
+//     legend.append("rect")
+//         .attr("x", 0)
+//         .attr("y", 20)
+//         .attr("width", 10)
+//         .attr("height", 10)
+//         .attr("fill", "blue");
+
+//     legend.append("text")
+//         .attr("x", 20)
+//         .attr("y", 30)
+//         .style("fill", "white")
+//         .text("Right Hand");
+
+// }
+
 function plotFingerTappingSessionDetails(data, userFilterValue, sessionLabel) {
     console.log("Plotting session details for:", sessionLabel);
 
@@ -1087,6 +1233,7 @@ function plotFingerTappingSessionDetails(data, userFilterValue, sessionLabel) {
     const width = graphWidth - margin.left - margin.right;
     const height = graphHeight - margin.top - margin.bottom;
 
+    // Remove any existing SVG in the graph area
     d3.select("#graph-area").selectAll("svg").remove();
 
     const svg = d3.select('#graph-area').append('svg')
@@ -1097,75 +1244,89 @@ function plotFingerTappingSessionDetails(data, userFilterValue, sessionLabel) {
         .attr('transform', `translate(${margin.left},${margin.top})`);
 
     const session = data[userFilterValue].FingerTapping[sessionLabel];
+    console.log("session:", session);
 
-    const leftData = session.LeftHand && session.LeftHand.LeftButton !== undefined ? session.LeftHand.LeftButton.map((time, i) => ({ index: i, time })) : [];
-    // console.log("left", leftData);
-    const rightData = session.RightHand && session.RightHand.RightButton !== undefined ? session.RightHand.RightButton.map((time, i) => ({ index: i, time })) : [];
-    // console.log("right", rightData);
+    // Compute inter-tap intervals (difference between consecutive taps)
+    const leftData = session.LeftHand && session.LeftHand.LeftButton !== undefined 
+        ? session.LeftHand.LeftButton.map((time, i) => ({ index: i, time })) 
+        : [];
+    const rightData = session.RightHand && session.RightHand.RightButton !== undefined 
+        ? session.RightHand.RightButton.map((time, i) => ({ index: i, time })) 
+        : [];
     
+    console.log("leftData:", leftData);
+    console.log("rightData:", rightData);
+
+    // Calculate inter-tap intervals
+    const leftIntervals = leftData.length > 1 
+        ? leftData.map((d, i) => i > 0 ? { index: i - 1, interval: leftData[i].time - leftData[i - 1].time } : null).slice(1) 
+        : [];
+    const rightIntervals = rightData.length > 1 
+        ? rightData.map((d, i) => i > 0 ? { index: i - 1, interval: rightData[i].time - rightData[i - 1].time } : null).slice(1) 
+        : [];
+
+    console.log("leftIntervals:", leftIntervals);
+    console.log("rightIntervals:", rightIntervals);
+
+    // Set up x and y scales based on inter-tap intervals
     const xScale = d3.scaleLinear()
-        .domain([0, Math.max(leftData.length, rightData.length)])
+        .domain([0, Math.max(leftIntervals.length, rightIntervals.length)])
         .range([0, width]);
 
     const yScale = d3.scaleLinear()
-        .domain([0, d3.max([...leftData.map(d => d.time), ...rightData.map(d => d.time)])])
+        .domain([0, d3.max([...leftIntervals.map(d => d.interval), ...rightIntervals.map(d => d.interval)])])
         .range([height, 0])
         .nice();
 
-    // Add X and Y axis
+    // Add X-axis
     svg.append("g")
         .attr("transform", `translate(0,${height})`)
         .call(d3.axisBottom(xScale))
         .selectAll("text")
         .style("fill", "white");
 
-    svg.select(".domain").attr("stroke", "white");  // Make X-axis line white
-    svg.selectAll(".tick line").attr("stroke", "white");  // Make X-axis tick marks white
-    
+    // Add Y-axis
     svg.append("g")
         .call(d3.axisLeft(yScale))
         .selectAll("text")
         .style("fill", "white");
 
-    svg.selectAll(".domain").attr("stroke", "white");  // Make Y-axis line white
-    svg.selectAll(".tick line").attr("stroke", "white");  // Make Y-axis tick marks white        
-
     // Add X-axis label
     svg.append("text")
         .attr("text-anchor", "middle")
         .attr("x", width / 2)
-        .attr("y", height + margin.bottom - 20)  // Position below the axis
+        .attr("y", height + margin.bottom - 20)
         .style("fill", "white")
-        .text("Tap Count");
+        .text("Tap Count (Inter-tap Interval)");
 
     // Add Y-axis label
     svg.append("text")
         .attr("text-anchor", "middle")
-        .attr("transform", "rotate(-90)")  // Rotate to align with Y-axis
-        .attr("x", -height / 2)  // Center along Y-axis
-        .attr("y", -margin.left + 20)  // Position to the left of the Y-axis
+        .attr("transform", "rotate(-90)")
+        .attr("x", -height / 2)
+        .attr("y", -margin.left + 20)
         .style("fill", "white")
-        .text("Time (milliseconds)");
+        .text("Inter-tap Interval (milliseconds)");
 
-    // Line generator
+    // Line generator for inter-tap intervals
     const lineGenerator = d3.line()
         .x(d => xScale(d.index))
-        .y(d => yScale(d.time));
+        .y(d => yScale(d.interval));
 
-    // Draw the line for left hand
-    if (leftData.length > 0) {
+    // Plot the left hand inter-tap intervals
+    if (leftIntervals.length > 0) {
         svg.append("path")
-            .datum(leftData)
+            .datum(leftIntervals)
             .attr("fill", "none")
             .attr("stroke", "green")
             .attr("stroke-width", 2)
             .attr("d", lineGenerator);
     }
 
-    // Draw the line for right hand
-    if (rightData.length > 0) {
+    // Plot the right hand inter-tap intervals
+    if (rightIntervals.length > 0) {
         svg.append("path")
-            .datum(rightData)
+            .datum(rightIntervals)
             .attr("fill", "none")
             .attr("stroke", "blue")
             .attr("stroke-width", 2)
@@ -1178,7 +1339,7 @@ function plotFingerTappingSessionDetails(data, userFilterValue, sessionLabel) {
         .attr("y", -10)
         .attr("text-anchor", "middle")
         .style("font-size", "20px")
-        .text(`Session ${sessionLabel} - Left vs Right Hand Reaction Time`)
+        .text(`Session ${sessionLabel} - Left vs Right Hand Inter-Tap Intervals`)
         .style("fill", "white");
 
     // Add a legend
@@ -1212,8 +1373,8 @@ function plotFingerTappingSessionDetails(data, userFilterValue, sessionLabel) {
         .attr("y", 30)
         .style("fill", "white")
         .text("Right Hand");
-
 }
+
 
 function plotFlankerTest(data, userFilterValue) {
     console.log("Plotting FlankerTest", data);

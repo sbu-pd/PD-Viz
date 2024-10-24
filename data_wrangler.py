@@ -97,14 +97,12 @@ def finger_tapping(data):
                                     pressed.append(i["Pressed"])
                                 elif "Released" in i:
                                     released.append(i["Released"])
-                            for i in range(len(released)):
-                                res[session_date][hand][prop].append(released[i] - pressed[i])
+                            for i in range(len(pressed)):
+                                res[session_date][hand][prop].append(pressed[i])
                         if prop == "TapAcceleration":
                             res[session_date][hand][prop] = handle_raw_acceleration_data(prop_values)
                         if prop == "TapCount":
-                            print(prop_values[list(prop_values.keys())[-1]])
                             res[session_date][hand][prop] = prop_values[list(prop_values.keys())[-1]]
-
     except Exception as e:
         print(e)
     return res
@@ -250,7 +248,6 @@ def flanker_test(data):
                 total_correct = 0
                 for instance_data in session_data[1:]:
                     for _, d in instance_data.items():
-                        print(d)
                         is_correct = False
                         if d.get('feedback') == "Correct":
                             total_correct += 1
